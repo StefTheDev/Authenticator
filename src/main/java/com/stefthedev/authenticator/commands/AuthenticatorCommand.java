@@ -25,7 +25,7 @@ public class AuthenticatorCommand extends Command implements TabCompleter {
         if(args.length > 0) {
             commands.forEach(command -> {
                 if(args[0].equalsIgnoreCase(command.toString())) {
-                    if(player.hasPermission(toString() + "." + command.toString())) {
+                    if(player.hasPermission(toString() + "." + command.toString()) || player.hasPermission(toString() + ".*")) {
                         command.run(player, args);
                     }
                 }

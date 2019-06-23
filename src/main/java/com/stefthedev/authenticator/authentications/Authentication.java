@@ -18,7 +18,7 @@ public class Authentication {
         this.key = key;
     }
 
-    void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
@@ -30,7 +30,7 @@ public class Authentication {
         return key;
     }
 
-    boolean isEnabled() {
+    public boolean isEnabled() {
         return enabled;
     }
 }

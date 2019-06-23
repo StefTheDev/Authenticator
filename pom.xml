@@ -6,7 +6,7 @@
 
     <groupId>com.stefthedev.authenticator</groupId>
     <artifactId>Authenticator</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>RELEASE-1.0</version>
     <build>
         <plugins>
             <plugin>

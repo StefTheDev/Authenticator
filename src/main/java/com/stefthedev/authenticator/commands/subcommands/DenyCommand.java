@@ -19,11 +19,13 @@ public class DenyCommand extends Command {
 
     @Override
     public boolean run(Player player, String[] args) {
-        AuthenticationRequest authenticationRequest = authenticationHandler.getRequest(player);
+        AuthenticationRequest authenticationRequest = authenticationHandler.getRequest(player.getUniqueId());
         if(authenticationRequest == null) {
             player.sendMessage(Chat.format(Message.REQUEST_NULL.toString()));
         } else {
             authenticationRequest.deny();
+            authenticationHandler.remove(authenticationRequest.getAuthentication());
+            authenticationHandler.add(authenticationRequest.getAuthentication());
             authenticationHandler.remove(authenticationRequest);
         }
         return false;

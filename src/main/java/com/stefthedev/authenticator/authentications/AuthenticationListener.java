@@ -30,17 +30,18 @@ public class AuthenticationListener implements Listener {
         if(authentication == null) {
             event.setJoinMessage("");
             authentication = new Authentication(player.getUniqueId(), null, false);
-
-            AuthenticationRequest authenticationRequest = new AuthenticationRequest(
-                    AuthenticationRequest.AuthenticationRequestAction.SETUP,
-                    authentication,
-                    player.getUniqueId()
-            );
-
-            authenticationRequest.send();
-
             authenticationHandler.add(authentication);
-            authenticationHandler.add(authenticationRequest);
+
+            if(player.hasPermission("authenticator.use")) {
+                AuthenticationRequest authenticationRequest = new AuthenticationRequest(
+                        AuthenticationRequest.AuthenticationRequestAction.SETUP,
+                        authentication,
+                        player.getUniqueId()
+                );
+                authenticationRequest.send();
+                authenticationHandler.add(authenticationRequest);
+            }
+            return;
         }
 
         if(authentication.isEnabled()) {
@@ -62,7 +63,13 @@ public class AuthenticationListener implements Listener {
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
-        authenticationHandler.unload(event.getPlayer());
+        Player player = event.getPlayer();
+        if (authenticationHandler.getAuthentication(player.getUniqueId()) != null) {
+            authenticationHandler.unload(event.getPlayer().getUniqueId());
+            if(authenticationHandler.getAuthentication(player.getUniqueId()).isEnabled()) {
+                player.removePotionEffect(PotionEffectType.BLINDNESS);
+            }
+        }
     }
 
     @EventHandler
@@ -93,7 +100,7 @@ public class AuthenticationListener implements Listener {
 
             event.setCancelled(true);
             String message = event.getMessage();
-            Authentication authentication = authenticationHandler.getAuthentication(player);
+            Authentication authentication = authenticationHandler.getAuthentication(player.getUniqueId());
             if(!StringUtils.isNumericSpace(message)){
                 player.sendMessage(Chat.format(Message.AUTHENTICATION_FAILED.toString()));
                 return;

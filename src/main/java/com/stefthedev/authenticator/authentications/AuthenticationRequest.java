@@ -14,12 +14,11 @@ import java.util.UUID;
 public class AuthenticationRequest {
 
     public enum AuthenticationRequestAction {
-        DISABLE,
-        ENABLE,
+        RESET,
         SETUP
     }
 
-    private final Authentication authentication;
+    private  Authentication authentication;
     private final UUID uuid;
     private final AuthenticationRequestAction authenticationRequestAction;
 
@@ -40,12 +39,8 @@ public class AuthenticationRequest {
         deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/authenticator deny"));
 
         switch (authenticationRequestAction) {
-            case DISABLE: {
-                player.sendMessage(Chat.format(Message.REQUEST_DISABLE.toString()));
-                player.spigot().sendMessage(accept, deny);
-            } break;
-            case ENABLE: {
-                player.sendMessage(Chat.format(Message.REQUEST_ENABLE.toString()));
+            case RESET: {
+                player.sendMessage(Chat.format(Message.REQUEST_RESET.toString()));
                 player.spigot().sendMessage(accept, deny);
             } break;
             case SETUP: {
@@ -59,32 +54,24 @@ public class AuthenticationRequest {
         Player player = Bukkit.getPlayer(uuid);
         if(player == null)return;
 
-        switch (authenticationRequestAction) {
-            case DISABLE: {
-                authentication.setEnabled(false);
-                player.sendMessage(Chat.format(Message.REQUEST_DISABLE_ACCEPT.toString()));
-            } break;
-            case ENABLE: {
+        GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
 
-                GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
+        switch (authenticationRequestAction) {
+            case RESET: {
                 GoogleAuthenticatorKey googleAuthenticatorKey = googleAuthenticator.createCredentials();
 
-                String key = googleAuthenticatorKey.getKey();
-                authentication.setKey(key);
+                authentication.setKey(googleAuthenticatorKey.getKey());
                 authentication.setEnabled(true);
 
-                player.sendMessage(Chat.format(Message.REQUEST_ENABLE_ACCEPT.toString().replace("{0}", key)));
+                player.sendMessage(Chat.format(Message.REQUEST_RESET_ACCEPT.toString().replace("{0}", googleAuthenticatorKey.getKey())));
             } break;
             case SETUP: {
-
-                GoogleAuthenticator googleAuthenticator = new GoogleAuthenticator();
                 GoogleAuthenticatorKey googleAuthenticatorKey = googleAuthenticator.createCredentials();
 
-                String key = googleAuthenticatorKey.getKey();
-                authentication.setKey(key);
+                authentication.setKey(googleAuthenticatorKey.getKey());
                 authentication.setEnabled(true);
 
-                player.sendMessage(Chat.format(Message.REQUEST_SETUP_ACCEPT.toString().replace("{0}", key)));
+                player.sendMessage(Chat.format(Message.REQUEST_SETUP_ACCEPT.toString().replace("{0}", googleAuthenticatorKey.getKey())));
             } break;
         }
     }
@@ -94,12 +81,9 @@ public class AuthenticationRequest {
         if(player == null)return;
 
         switch (authenticationRequestAction) {
-            case DISABLE: {
+            case RESET: {
                 authentication.setEnabled(false);
-                player.sendMessage(Chat.format(Message.REQUEST_DISABLE_DENY.toString()));
-            } break;
-            case ENABLE: {
-                player.sendMessage(Chat.format(Message.REQUEST_ENABLE_DENY.toString()));
+                player.sendMessage(Chat.format(Message.REQUEST_RESET_DENY.toString()));
             } break;
             case SETUP: {
                 authentication.setEnabled(false);
@@ -110,5 +94,9 @@ public class AuthenticationRequest {
 
     UUID getUuid() {
         return uuid;
+    }
+
+    public Authentication getAuthentication() {
+        return authentication;
     }
 }

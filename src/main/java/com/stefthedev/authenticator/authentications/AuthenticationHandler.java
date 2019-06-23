@@ -5,10 +5,7 @@ import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class AuthenticationHandler {
 
@@ -35,33 +32,51 @@ public class AuthenticationHandler {
         if(section == null) return null;
         for(String string : section.getKeys(false)) {
             if (string.equalsIgnoreCase(player.getUniqueId().toString())) {
-                String key = fileConfiguration.getString(string + ".key");
+                String secretKey = new String(Base64.getDecoder().decode(Objects.requireNonNull(fileConfiguration.getString(string + ".key"))));
                 boolean enabled = fileConfiguration.getBoolean(string + ".enabled");
-                return new Authentication(player.getUniqueId(), key, enabled);
+                return new Authentication(player.getUniqueId(), secretKey, enabled);
             }
         }
         return null;
     }
 
-    void unload(Player player) {
-        Authentication authentication = getAuthentication(player);
+    public Authentication load(UUID uuid) {
+        ConfigurationSection section = fileConfiguration.getConfigurationSection("");
+        if(section == null) return null;
+        for(String string : section.getKeys(false)) {
+            if (string.equalsIgnoreCase(uuid.toString())) {
+                String secretKey = new String(Base64.getDecoder().decode(Objects.requireNonNull(fileConfiguration.getString(string + ".key"))));
+                boolean enabled = fileConfiguration.getBoolean(string + ".enabled");
+                return new Authentication(uuid, secretKey, enabled);
+            }
+        }
+        return null;
+    }
+
+    void unload(UUID uuid) {
+        Authentication authentication = getAuthentication(uuid);
         if (authentication == null) return;
-        fileConfiguration.set(authentication.getUuid().toString() + ".key", authentication.getKey());
+
+        String secretKey = Base64.getEncoder().encodeToString(authentication.getKey().getBytes());
+
+        fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
         fileConfiguration.set(authentication.getUuid().toString() + ".enabled", authentication.isEnabled());
-        uuids.remove(player.getUniqueId());
+        uuids.remove(uuid);
         authenticator.saveConfig();
     }
 
     public void unload() {
         authentications.forEach(authentication -> {
-            fileConfiguration.set(authentication.getUuid().toString() + ".key", authentication.getKey());
+            String secretKey = Base64.getEncoder().encodeToString(authentication.getKey().getBytes());
+
+            fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
             fileConfiguration.set(authentication.getUuid().toString() + ".enabled", authentication.isEnabled());
         });
 
         authenticator.saveConfig();
     }
 
-    void add(Authentication authentication) {
+    public void add(Authentication authentication) {
         authentications.add(authentication);
     }
 
@@ -85,18 +100,18 @@ public class AuthenticationHandler {
         uuids.remove(uuid);
     }
 
-    public AuthenticationRequest getRequest(Player player) {
+    public AuthenticationRequest getRequest(UUID uuid) {
         for(AuthenticationRequest authenticationRequest : authenticationRequests) {
-            if(authenticationRequest.getUuid().equals(player.getUniqueId())) {
+            if(authenticationRequest.getUuid().equals(uuid)) {
                 return authenticationRequest;
             }
         }
         return null;
     }
 
-    public Authentication getAuthentication(Player player) {
+    public Authentication getAuthentication(UUID uuid) {
         for(Authentication authentication : authentications) {
-            if(authentication.getUuid().equals(player.getUniqueId())) {
+            if(authentication.getUuid().equals(uuid)) {
                 return authentication;
             }
         }

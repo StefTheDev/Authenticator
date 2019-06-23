@@ -3,10 +3,7 @@ package com.stefthedev.authenticator;
 import com.stefthedev.authenticator.authentications.AuthenticationHandler;
 import com.stefthedev.authenticator.authentications.AuthenticationListener;
 import com.stefthedev.authenticator.commands.AuthenticatorCommand;
-import com.stefthedev.authenticator.commands.subcommands.AcceptCommand;
-import com.stefthedev.authenticator.commands.subcommands.DenyCommand;
-import com.stefthedev.authenticator.commands.subcommands.DisableCommand;
-import com.stefthedev.authenticator.commands.subcommands.EnableCommand;
+import com.stefthedev.authenticator.commands.subcommands.*;
 import com.stefthedev.authenticator.utilities.Config;
 import com.stefthedev.authenticator.utilities.Message;
 import org.bukkit.event.Listener;
@@ -30,7 +27,8 @@ public class Authenticator extends JavaPlugin {
                 new AcceptCommand(this),
                 new DenyCommand(this),
                 new DisableCommand(this),
-                new EnableCommand(this)
+                new EnableCommand(this),
+                new ResetCommand(this)
         );
 
         Objects.requireNonNull(getCommand("authenticator")).setExecutor(authenticatorCommand);
