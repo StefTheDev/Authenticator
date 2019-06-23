@@ -1,0 +1,11 @@
+name: Authenticator
+main: com.stefthedev.authenticator.Authenticator
+version: 1.0
+author: StefTheDev
+
+commands:
+  authenticator:
+    description: The authentication plugin.
+    aliases:
+      - auth
+      - authentication
