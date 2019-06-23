@@ -6,6 +6,7 @@ import com.stefthedev.authenticator.authentications.AuthenticationHandler;
 import com.stefthedev.authenticator.utilities.Chat;
 import com.stefthedev.authenticator.utilities.Command;
 import com.stefthedev.authenticator.utilities.Message;
+import com.warrenstrange.googleauth.GoogleAuthenticator;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
@@ -27,19 +28,27 @@ public class EnableCommand extends Command {
         if(args.length == 2 && player.hasPermission("authenticator.admin.disable")) {
             String string = args[1];
             OfflinePlayer offlinePlayer = getOfflinePlayer(string);
+
             if(offlinePlayer == null) {
                 player.sendMessage(Chat.format(Message.OFFLINE_PLAYER_NULL.toString().replace("{0}", string)));
             } else {
                 Authentication authentication = authenticationHandler.load(offlinePlayer.getUniqueId());
-                authentication.setEnabled(false);
-
-                player.sendMessage(Chat.format(Message.AUTHENTICATION_ENABLED_OTHER.toString().replace("{0}", Objects.requireNonNull(offlinePlayer.getName()))));
+                if(authentication.getKey() == null) {
+                    player.sendMessage(Chat.format(Message.AUTHENTICATION_KEY_OTHER.toString().replace("{0}", Objects.requireNonNull(offlinePlayer.getName()))));
+                } else {
+                    authentication.setEnabled(true);
+                    player.sendMessage(Chat.format(Message.AUTHENTICATION_ENABLED_OTHER.toString().replace("{0}", Objects.requireNonNull(offlinePlayer.getName()))));
+                }
             }
         } else {
             Authentication authentication = authenticationHandler.getAuthentication(player.getUniqueId());
             if(!authentication.isEnabled()) {
-                authentication.setEnabled(true);
-                player.sendMessage(Chat.format(Message.AUTHENTICATION_ENABLE.toString()));
+                if(authentication.getKey() == null) {
+                    player.sendMessage(Chat.format(Message.AUTHENTICATION_KEY.toString()));
+                } else {
+                    authentication.setEnabled(true);
+                    player.sendMessage(Chat.format(Message.AUTHENTICATION_ENABLE.toString()));
+                }
             } else {
                 player.sendMessage(Chat.format(Message.AUTHENTICATION_ENABLED.toString()));
             }

@@ -27,39 +27,23 @@ public class AuthenticationHandler {
         this.uuids = new HashSet<>();
     }
 
-    Authentication load(Player player) {
-        ConfigurationSection section = fileConfiguration.getConfigurationSection("");
-        if(section == null) return null;
-        for(String string : section.getKeys(false)) {
-            if (string.equalsIgnoreCase(player.getUniqueId().toString())) {
-                String secretKey = new String(Base64.getDecoder().decode(Objects.requireNonNull(fileConfiguration.getString(string + ".key"))));
-                boolean enabled = fileConfiguration.getBoolean(string + ".enabled");
-                return new Authentication(player.getUniqueId(), secretKey, enabled);
-            }
-        }
-        return null;
-    }
-
     public Authentication load(UUID uuid) {
-        ConfigurationSection section = fileConfiguration.getConfigurationSection("");
-        if(section == null) return null;
-        for(String string : section.getKeys(false)) {
-            if (string.equalsIgnoreCase(uuid.toString())) {
-                String secretKey = new String(Base64.getDecoder().decode(Objects.requireNonNull(fileConfiguration.getString(string + ".key"))));
-                boolean enabled = fileConfiguration.getBoolean(string + ".enabled");
-                return new Authentication(uuid, secretKey, enabled);
-            }
-        }
-        return null;
+        if(fileConfiguration.get(uuid.toString()) == null) return null;
+        String secretKey = new String(Base64.getDecoder().decode(Objects.requireNonNull(fileConfiguration.getString(uuid.toString() + ".key"))));
+        boolean enabled = fileConfiguration.getBoolean(uuid.toString() + ".enabled");
+        return new Authentication(uuid, secretKey, enabled);
     }
 
     void unload(UUID uuid) {
         Authentication authentication = getAuthentication(uuid);
         if (authentication == null) return;
+        if(authentication.getKey() != null) {
+            String secretKey = new String((Base64.getEncoder().encode(authentication.getKey().getBytes())));
+            fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
+        } else {
+            fileConfiguration.set(authentication.getUuid().toString() + ".key", "");
+        }
 
-        String secretKey = Base64.getEncoder().encodeToString(authentication.getKey().getBytes());
-
-        fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
         fileConfiguration.set(authentication.getUuid().toString() + ".enabled", authentication.isEnabled());
         uuids.remove(uuid);
         authenticator.saveConfig();
@@ -67,9 +51,13 @@ public class AuthenticationHandler {
 
     public void unload() {
         authentications.forEach(authentication -> {
-            String secretKey = Base64.getEncoder().encodeToString(authentication.getKey().getBytes());
+            if(authentication.getKey() != null) {
+                String secretKey = new String((Base64.getEncoder().encode(authentication.getKey().getBytes())));
+                fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
+            } else {
+                fileConfiguration.set(authentication.getUuid().toString() + ".key", "");
+            }
 
-            fileConfiguration.set(authentication.getUuid().toString() + ".key", secretKey);
             fileConfiguration.set(authentication.getUuid().toString() + ".enabled", authentication.isEnabled());
         });
 

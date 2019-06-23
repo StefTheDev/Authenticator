@@ -1,6 +1,6 @@
 name: Authenticator
 main: com.stefthedev.authenticator.Authenticator
-version: RELEASE-1.0
+version: RELEASE-1.1
 author: StefTheDev
 
 commands:

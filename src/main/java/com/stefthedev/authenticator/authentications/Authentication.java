@@ -26,7 +26,7 @@ public class Authentication {
         return uuid;
     }
 
-    String getKey() {
+    public String getKey() {
         return key;
     }
 

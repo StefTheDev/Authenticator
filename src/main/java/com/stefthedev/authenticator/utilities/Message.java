@@ -13,6 +13,8 @@ public enum Message {
     AUTHENTICATION_ENABLED("authentication-enabled", "You already have &a2FA&7 enabled."),
     AUTHENTICATION_ENABLED_OTHER("authentication-enable-other", "You have enabled &a2FA&7 for &f{0}&7."),
     AUTHENTICATION_FAILED("authentication-failed", "You failed to authenticate! Please enter a valid &a2FA&7 code."),
+    AUTHENTICATION_KEY("authentication-key", "You can't enable &a2FA &7because you do not have a secret key assigned. Type &b/auth reset&7 to retrieve a secret key."),
+    AUTHENTICATION_KEY_OTHER("authentication-key-other", "You can't enable &a2FA for &b{0}&7 because they do not have a secret key assigned."),
     AUTHENTICATION_KICK("authentication-kick", "&b&lAuthenticator\n\n&7You failed to enter the correct code in time.\n&7Please reconnect and try again."),
     FREFIX("prefix", "&b&lAuthenticator: &7"),
     HELP("help", "&b&lAuthenticator: &7Version {0}"),

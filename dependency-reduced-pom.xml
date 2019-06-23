@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.stefthedev.authenticator</groupId>
   <artifactId>Authenticator</artifactId>
-  <version>RELEASE-1.0</version>
+  <version>RELEASE-1.1</version>
   <build>
     <plugins>
       <plugin>

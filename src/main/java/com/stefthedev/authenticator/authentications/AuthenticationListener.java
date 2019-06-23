@@ -25,7 +25,7 @@ public class AuthenticationListener implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
-        Authentication authentication = authenticationHandler.load(player);
+        Authentication authentication = authenticationHandler.load(player.getUniqueId());
 
         if(authentication == null) {
             event.setJoinMessage("");
